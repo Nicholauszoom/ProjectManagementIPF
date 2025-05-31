@@ -1,5 +1,6 @@
 package com.example.Project.Management.IPF.auth.user.entity;
 
+import com.example.Project.Management.IPF.auth.role.Role;
 import com.example.Project.Management.IPF.common.entity.CommonEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -34,8 +35,15 @@ public class User extends CommonEntity implements Serializable {
     @JsonIgnore
     private String password;
 
+    @Column(name="user_name",nullable = false,length = 50, unique = true)
+    private String userName;
+
     @Column(name="email_address",nullable = false, length = 100)
     private String emailAddress;
+
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role=Role.USER;
 
 
 }
