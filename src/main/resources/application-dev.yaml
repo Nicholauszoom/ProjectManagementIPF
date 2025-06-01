@@ -1,0 +1,29 @@
+server:
+  host: 127.0.0.1
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/project-management-ipf?currentSchema=pmIpf
+    username: postgres
+    password: irCsM4l4wi
+#  ##Authentication Verification
+#  oauth2.server.uri: http://127.0.0.1:8081
+#  security:
+#    oauth2:
+#      client.provider.identity.token-uri: http://127.0.0.1:8081/oauth2/token
+#      resourceserver.jwt.issuer-uri: http://127.0.0.1:8081
+
+  #Email service
+  mail:
+    host: smtp.gmail.com
+    username: nicholaussomi5
+    password: rjxfmhmlcwzrdmhi
+    properties:
+      mail:
+        transport.protocol: smtp
+        smtp:
+          port: 587
+          auth: true
+          starttls.enable: true
+  #          ssl.enable: true
+
