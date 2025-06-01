@@ -19,6 +19,7 @@ public class ProjectDto implements Serializable {
     private Date startDate;
     private Date endDate;
     private long userId;
+    private String userFullName;
 
 
 }

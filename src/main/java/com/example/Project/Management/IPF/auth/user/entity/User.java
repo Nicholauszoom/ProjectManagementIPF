@@ -26,7 +26,7 @@ public class User extends CommonEntity implements Serializable {
     @Id
     @GeneratedValue
     @UuidGenerator
-    private UUID id;
+    private Long id;
 
     @Column(name="full_name",nullable = false,length = 100)
     private String fullName;
