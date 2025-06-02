@@ -3,12 +3,12 @@ spring:
     hikari.schema: public
     url: jdbc:postgresql://localhost:5432/project_management_ipf?serverTimezone=UTC
     username: postgres
-    password: SOMI
+    password:
   #Email service
   mail:
     host: smtp.gmail.com
-    username: nicholaussomi5
-    password: rjxfmhmlcwzrdmhi
+    username:
+    password:
     properties:
       mail:
         transport.protocol: smtp

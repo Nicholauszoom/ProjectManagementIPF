@@ -16,6 +16,7 @@ public class TaskDto {
     private Date startDate;
     private Date endDate;
     private String username;
+    private String status;
 
 
     public Long getId() {

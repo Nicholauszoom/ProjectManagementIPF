@@ -13,11 +13,12 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-import static com.example.Project.Management.IPF.auth.role.Role.MANAGER;
+
 
 @RestController
 @RequestMapping("/api/project")
@@ -39,6 +40,7 @@ public class ProjectController {
 
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<?> createProject(@RequestBody ProjectDto projectDto,
                                           HttpServletRequest request) {
 
@@ -49,7 +51,7 @@ public class ProjectController {
             long userId =projectDto.getUserId();
             Optional<User> user = userService.findByUserId(userId);
 
-            if(projectDto != null && user.get().getRole().name().equals(MANAGER)){
+            if(projectDto != null){
 
                 if (user.get()!=null){
 
@@ -180,6 +182,7 @@ public class ProjectController {
     }
 
     @PostMapping("/update")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<?> updateProject(@RequestBody ProjectDto projectDto ,
                                               HttpServletRequest request) {
 
@@ -188,7 +191,7 @@ public class ProjectController {
         try {
             Optional<Project> project = projectService.findById(projectDto.getId());
             Optional<User> user = userService.findByUserId(projectDto.getUserId());
-            if(project.isPresent() && user.get().getRole().name().equals(MANAGER)){
+            if(project.isPresent()){
                 project.get().setProjectName(projectDto.getProjectName());
                 project.get().setProjectDescription(projectDto.getProjectDescription());
                 project.get().setUser(user.get());
@@ -223,6 +226,7 @@ public class ProjectController {
     }
 
     @PostMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<?> deleteProject(@RequestBody ProjectDto projectDto ,
                                            HttpServletRequest request) {
 
@@ -232,7 +236,7 @@ public class ProjectController {
             Optional<Project> project = projectService.findById(projectDto.getId());
             Optional<User> user = userService.findByUserId(projectDto.getUserId());
 
-            if(project.isPresent() && user.get().getRole().name().equals(MANAGER)){
+            if(project.isPresent()){
 
                 projectService.deleteProjectById(projectDto.getId());
 

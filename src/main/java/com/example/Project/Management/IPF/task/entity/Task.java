@@ -2,6 +2,7 @@ package com.example.Project.Management.IPF.task.entity;
 
 import com.example.Project.Management.IPF.auth.user.entity.User;
 import com.example.Project.Management.IPF.common.entity.CommonEntity;
+import com.example.Project.Management.IPF.common.entity.Status;
 import com.example.Project.Management.IPF.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -58,5 +59,12 @@ public class Task extends CommonEntity implements Serializable {
     private Date startDate;
     @Column(name = "end_date", length = 50, nullable = false)
     private Date endDate;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status taskStatus= Status.IN_PROGRESS;
+
+
+
 
 }

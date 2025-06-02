@@ -2,11 +2,9 @@ package com.example.Project.Management.IPF.task.controller;
 
 import com.example.Project.Management.IPF.auth.user.entity.User;
 import com.example.Project.Management.IPF.auth.user.service.UserService;
-import com.example.Project.Management.IPF.project.dto.ProjectDto;
-import com.example.Project.Management.IPF.project.entity.Project;
-import com.example.Project.Management.IPF.project.service.ProjectService;
 import com.example.Project.Management.IPF.task.dto.TaskDto;
 import com.example.Project.Management.IPF.task.entity.Task;
+import com.example.Project.Management.IPF.common.entity.Status;
 import com.example.Project.Management.IPF.task.service.TaskService;
 import com.example.Project.Management.IPF.util.Response;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,11 +13,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-import static com.example.Project.Management.IPF.auth.role.Role.MANAGER;
 
 @RestController
 @RequestMapping("/api/task")
@@ -42,6 +40,7 @@ public class TaskController {
 
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<?> createTask(@RequestBody TaskDto taskDto,
                                            HttpServletRequest request) {
 
@@ -52,7 +51,7 @@ public class TaskController {
             long userId =taskDto.getUserId();
             Optional<User> user = userService.findByUserId(userId);
 
-            if(taskDto != null && user.get().getRole().name().equals(MANAGER)){
+            if(taskDto != null){
 
                 if (user.get()!=null){
 
@@ -62,6 +61,7 @@ public class TaskController {
                     task.setStartDate(taskDto.getStartDate());
                     task.setEndDate(taskDto.getEndDate());
                     task.setUser(user.get());
+                    task.setTaskStatus(Status.valueOf(taskDto.getStatus()));
                     taskService.taskSave(task);
 
                     message = messageSource.getMessage("message.1001", null, currentLocale);
@@ -106,6 +106,7 @@ public class TaskController {
                     taskDto.setTaskDescription(task.getTaskDescription());
                     taskDto.setStartDate(task.getStartDate());
                     taskDto.setEndDate(task.getEndDate());
+                    taskDto.setStatus(taskDto.getStatus());
                     taskDtoArrayList.add(taskDto);
 
                 }
@@ -176,6 +177,7 @@ public class TaskController {
     }
 
     @PostMapping("/update")
+    @PreAuthorize("hasRole('USER') or hasRole('MANAGER')")
     public ResponseEntity<?> updateTask(@RequestBody TaskDto taskDto ,
                                            HttpServletRequest request) {
 
@@ -184,13 +186,13 @@ public class TaskController {
         try {
             Optional<Task> task = taskService.findById(taskDto.getId());
             Optional<User> user = userService.findByUserId(taskDto.getUserId());
-            if(task.isPresent() && user.get().getRole().name().equals(MANAGER)){
+            if(task.isPresent()){
                 task.get().setTaskName(taskDto.getTaskName());
                 task.get().setTaskDescription(taskDto.getTaskDescription());
                 task.get().setUser(user.get());
                 task.get().setStartDate(taskDto.getStartDate());
                 task.get().setEndDate(taskDto.getEndDate());
-
+                task.get().setTaskStatus(Status.valueOf(taskDto.getStatus()));
                 Task updatedTask = taskService.taskSave(task.get());
 
                 if (updatedTask != null) {
@@ -219,6 +221,7 @@ public class TaskController {
     }
 
     @PostMapping("/delete")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<?> deleteTask(@RequestBody TaskDto taskDto ,
                                            HttpServletRequest request) {
 
@@ -228,7 +231,7 @@ public class TaskController {
             Optional<Task> task = taskService.findById(taskDto.getId());
             Optional<User> user = userService.findByUserId(taskDto.getUserId());
 
-            if(task.isPresent() && user.get().getRole().name().equals(MANAGER)){
+            if(task.isPresent()){
 
                 taskService.deleteTaskById(taskDto.getId());
 

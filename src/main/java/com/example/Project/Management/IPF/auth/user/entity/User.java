@@ -42,7 +42,7 @@ public class User implements UserDetails {
 
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role=Role.USER;
+    private Role role=Role.ROLE_USER;
 
 
     //constructor for creating an unverified user
