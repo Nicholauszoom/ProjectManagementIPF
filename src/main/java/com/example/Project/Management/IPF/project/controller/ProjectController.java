@@ -82,7 +82,15 @@ public class ProjectController {
             error  = true;
         }
 
-        Response response = new Response(String.valueOf(Calendar.getInstance().getTime()),status,error,message,project,request.getRequestURI());
+//        Response response = new Response(String.valueOf(Calendar.getInstance().getTime()),status,error,message,project,request.getRequestURI());
+        Response response = new Response(
+                String.valueOf(Calendar.getInstance().getTime()),
+                "200 OK",
+                false,
+                "Project fetched successfully",
+                project,
+                request.getRequestURI()
+        );
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -146,7 +154,7 @@ public class ProjectController {
                     projectDetail.setStartDate(foundProject.getStartDate());
                     projectDetail.setEndDate(foundProject.getEndDate());
                     projectDetail.setUserId(foundProject.getUser().getId());
-                    projectDetail.setUserFullName(foundProject.getUser().getFullName());
+                    projectDetail.setUserFullName(foundProject.getUser().getUsername());
 
                     message = messageSource.getMessage("message.1001", null, currentLocale);
                     status = messageSource.getMessage("code.1001", null, currentLocale);

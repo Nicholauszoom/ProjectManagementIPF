@@ -4,6 +4,9 @@ import com.example.Project.Management.IPF.auth.role.Role;
 import com.example.Project.Management.IPF.auth.user.dto.UserDto;
 import com.example.Project.Management.IPF.auth.user.entity.User;
 import com.example.Project.Management.IPF.auth.user.service.UserService;
+import com.example.Project.Management.IPF.config.JwtAuthenticationFilter;
+import com.example.Project.Management.IPF.project.dto.ProjectDto;
+import com.example.Project.Management.IPF.project.entity.Project;
 import com.example.Project.Management.IPF.util.Constants;
 import com.example.Project.Management.IPF.util.Response;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,11 +16,10 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -27,10 +29,7 @@ import java.util.*;
 public class UserController {
 
     @Autowired
-            private UserService userService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private UserService userService;
 
     @Autowired
     private MessageSource messageSource;
@@ -40,36 +39,79 @@ public class UserController {
     Boolean isError = false;
     Locale currentLocale = LocaleContextHolder.getLocale();
 
+    public UserController(UserService userService, MessageSource messageSource) {
+        this.userService = userService;
+        this.messageSource = messageSource;
+    }
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createUser(@RequestBody UserDto userDto, HttpServletRequest request){
+    @GetMapping("/me")
+    public ResponseEntity<User> authenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(currentUser);
+    }
 
-        UserDto createdUser = null;
+//    @GetMapping("/")
+//    public ResponseEntity<List<User>> allUsers() {
+//        List <User> users = userService.getAllUsers();
+//        return ResponseEntity.ok(users);
+//    }
+
+    @PostMapping("/list")
+    public ResponseEntity<?> getUserList(HttpServletRequest request, JwtAuthenticationFilter auth) {
+
+        List<UserDto> userDtoArrayList = new ArrayList<>();
+        try {
+            List<User> users = userService.findAll();
+            if (users != null) {
+
+                for (User user : users) {
+
+                    UserDto userDto = new UserDto();
+                    userDto.setId(user.getId());
+                    userDto.setUserName(user.getUsername());
+                    userDto.setEmail(user.getEmail());
+                    userDto.setRole(user.getRole().name());
+                    userDtoArrayList.add(userDto);
+
+                }
+                message = messageSource.getMessage("message.1001", null, currentLocale);
+                status = messageSource.getMessage("code.1001", null, currentLocale);
+                isError = false;
+            } else {
+                message = messageSource.getMessage("message.1007", null, currentLocale);
+                status = messageSource.getMessage("code.1007", null, currentLocale);
+                isError = true;
+            }
+
+        } catch (Exception e) {
+            message = messageSource.getMessage("message.1004", null, currentLocale);
+            status = messageSource.getMessage("code.1004", null, currentLocale);
+            isError = true;
+        }
+        Response response = new Response(String.valueOf(Calendar.getInstance().getTime()), status, isError, message, userDtoArrayList, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
+    @PostMapping("/assign_role")
+    public ResponseEntity<?> assignUserRole(@RequestBody UserDto userDto, HttpServletRequest request){
+
+        User assignUser = null;
         try {
 
-            byte[] credDecoded = Base64.decodeBase64(userDto.getPassword());
-            String plainPassword = new String(credDecoded, StandardCharsets.UTF_8);
+            if(userDto!=null){
+                Optional<User> user = userService.findByUserId(userDto.getId());
 
-            String encryptedPassword = passwordEncoder.encode(plainPassword);
-            List<User> oldUsersByName = userService.getByUserName(userDto.getEmailAddress().trim().toUpperCase());
+                if(user == null) {
 
-                if(oldUsersByName == null) {
+                    user.get().setRole(Role.valueOf(userDto.getRole()));
+                    User updatedUser = userService.saveUser(user.get());
 
-                    User user = new User();
-                    user.setCreatedBy(Constants.DEFAULT_SYS_USERID);
-                    user.setCreatedDate(new Date());
-                    user.setRole(Role.valueOf(userDto.getRole()));
-                    user.setEmailAddress(userDto.getEmailAddress());
-                    user.setUserName(userDto.getEmailAddress());
-                    user.setPassword(encryptedPassword);
-                    User newUser = userService.saveUser(user);
+                    assignUser = updatedUser;
 
-                    createdUser.setUserName(newUser.getUserName());
-                    createdUser.setFullName(newUser.getFullName());
-                    createdUser.setRole(newUser.getRole().name());
-
-                    if(newUser != null) {
-                        message = messageSource.getMessage("general.create.success", new Object[]{"User "}, currentLocale);
+                    if(assignUser != null) {
+                        message = messageSource.getMessage("general.updated.success", new Object[]{"User"}, currentLocale);
                         status = messageSource.getMessage("code.1001",null, currentLocale);
                         isError  = false;
 
@@ -78,6 +120,11 @@ public class UserController {
                         status = messageSource.getMessage("code.1002",null, currentLocale);
                         isError  = true;
                     }
+                } else {
+                    message = messageSource.getMessage("general.create.failure", new Object[]{"User "}, currentLocale);
+                    status = messageSource.getMessage("code.1002",null, currentLocale);
+                    isError  = true;
+                }
                 } else {
                     message = messageSource.getMessage("general.current.exists",new Object[]{"User "}, currentLocale);
                     status = messageSource.getMessage("code.1008",null, currentLocale);
@@ -91,7 +138,7 @@ public class UserController {
             isError = true;
         }
 
-        Response response = new Response(String.valueOf(Calendar.getInstance().getTime()),status,isError,message,createdUser,request.getRequestURI());
+        Response response = new Response(String.valueOf(Calendar.getInstance().getTime()),status,isError,message,assignUser,request.getRequestURI());
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }

@@ -1,18 +1,9 @@
-server:
-  host: 127.0.0.1
-
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/project-management-ipf?currentSchema=pmIpf
+    hikari.schema: public
+    url: jdbc:postgresql://localhost:5432/project_management_ipf?serverTimezone=UTC
     username: postgres
-    password: irCsM4l4wi
-#  ##Authentication Verification
-#  oauth2.server.uri: http://127.0.0.1:8081
-#  security:
-#    oauth2:
-#      client.provider.identity.token-uri: http://127.0.0.1:8081/oauth2/token
-#      resourceserver.jwt.issuer-uri: http://127.0.0.1:8081
-
+    password: SOMI
   #Email service
   mail:
     host: smtp.gmail.com

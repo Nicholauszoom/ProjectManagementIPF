@@ -15,12 +15,13 @@ import java.util.List;
 public class UserDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private Long id;
 
     private String role;
 
     private String password;
 
-    private String emailAddress;
+    private String email;
 
     private String fullName;
 
