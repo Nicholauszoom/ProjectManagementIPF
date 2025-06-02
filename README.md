@@ -30,6 +30,8 @@ POST /auth/signup - Register new users
 
 POST /auth/verify - Verify the code obtained from email
 
+![Email_verification_code_IPF_PROJECT_MANAGEMENT](https://github.com/user-attachments/assets/274c3fd1-9ec4-4f6f-bf02-89afa89da62b)
+
 ![image](https://github.com/user-attachments/assets/698f5b6b-94bf-4c74-8459-155d3bda6f52)
 
 
