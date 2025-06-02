@@ -24,9 +24,17 @@ JWT-based Authentication using Spring Security
 
 Endpoints:
 
-POST /auth/register - Register new users
+POST /auth/signup - Register new users
+![image](https://github.com/user-attachments/assets/5d5d5b3c-5d76-4210-9b9b-3ee1d8bad53b)
+
+POST /auth/verify - Verify the code obtained from email
+![Email_verification_code_IPF_PROJECT_MANAGEMENT](https://github.com/user-attachments/assets/274c3fd1-9ec4-4f6f-bf02-89afa89da62b)
+
+POST /auth/resend - Resend verification code via email
 
 POST /auth/login - Authenticate and get token
+![image](https://github.com/user-attachments/assets/05ca69e0-4df1-476f-b973-a3d67a49122f)
+
 
 POST /auth/logout - Invalidate token
 
