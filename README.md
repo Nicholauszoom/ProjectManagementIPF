@@ -30,7 +30,7 @@ POST /auth/signup - Register new users
 
 POST /auth/verify - Verify the code obtained from email
 
-![image](https://github.com/user-attachments/assets/79a34ecf-e139-483c-83d3-cfb6e2930364)
+![image](https://github.com/user-attachments/assets/698f5b6b-94bf-4c74-8459-155d3bda6f52)
 
 
 POST /auth/resend - Resend verification code via email
